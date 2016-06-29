@@ -18,6 +18,8 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    TextField tx1;
+    TextField tx2;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -34,7 +36,7 @@ public class Main extends Application {
         lb1.setTextAlignment(TextAlignment.CENTER);
         fp.add(lb1,0,0,2,1);
 
-        TextField tx1 = new TextField();
+        tx1 = new TextField();
         tx1.setPrefSize(300,20);
         tx1.setAlignment(Pos.CENTER);
         fp.add(tx1,0,1,2,1);
@@ -44,7 +46,7 @@ public class Main extends Application {
         bt1.setPrefSize(150,20);
         fp.add(bt1,0,2,1,1);
 
-        TextField tx2 = new TextField("Result here");
+        tx2 = new TextField("Result here");
         tx2.setPrefSize(150,20);
         tx2.setFont(new Font("Tahoma Italic", 10));
         tx2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), null)));
@@ -60,7 +62,7 @@ public class Main extends Application {
 
 
     void calc(ActionEvent e) {
-
+        String str = tx1.getText();
     }
 
     public static void main(String[] args) {
