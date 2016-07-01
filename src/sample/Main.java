@@ -7,15 +7,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main extends Application {
     TextField tx1;
@@ -63,7 +63,53 @@ public class Main extends Application {
 
     void calc(ActionEvent e) {
         String str = tx1.getText();
+        recursive_cal(str);
     }
+
+    double recursive_cal (String str) {
+        double result = 0;
+        Pattern p = Pattern.compile("(sin|cos|tan)\\([\\w+-]+?\\)");
+        Matcher m = p.matcher(str);
+        boolean found = false;
+
+        while (m.find()) {
+            StringBuffer sb = new StringBuffer();
+            System.out.println("> "+m.group());
+            found = true;
+
+            Pattern p2 = Pattern.compile("\\d+(.+)?(?=\\)+$)");
+            Matcher m2 = p2.matcher(m.group());
+            boolean found2 = false;
+            while (m2.find()) {
+                System.out.println(">> " + m2.group());
+                switch (m.group().substring(4,m.group().length()-1)) {
+                    case "sin":
+                        m2.appendReplacement(sb, String.valueOf(recursive_cal(m2.group())));
+                        m2.appendTail(sb);
+                        System.out.println(">>> "+ sb.toString());
+                        break;
+
+                    case "cos":
+
+                        break;
+
+                    case "tan":
+
+                        break;
+                }
+            }
+
+        }
+
+        if (!found) {
+            System.out.println(str);
+        }
+
+        return 0;
+    }
+
+
+
 
     public static void main(String[] args) {
         launch(args);
