@@ -22,43 +22,42 @@ import java.util.regex.Pattern;
 
 public class Main extends Application {
     private TextField tx1;
-    private TextField tx2;
+    private Label tx2;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         GridPane fp = new GridPane( );
-        fp.setHgap(20);
+        fp.setHgap(10);
         fp.setVgap(10);
-        //fp.setGridLinesVisible(true);
         fp.setAlignment(Pos.CENTER);
         fp.setPadding(new Insets(10,10,10,10));
 
         Label lb1 = new Label("Type your mathematical expression in the text field below...");
-        lb1.setPrefSize(300,20);
+        lb1.setPrefSize(355,20);
         lb1.setAlignment(Pos.CENTER);
         lb1.setTextAlignment(TextAlignment.CENTER);
         fp.add(lb1,0,0,2,1);
 
         tx1 = new TextField();
-        tx1.setPrefSize(300,20);
+        tx1.setPrefSize(355,20);
         tx1.setAlignment(Pos.CENTER);
         fp.add(tx1,0,1,2,1);
 
         Button bt1 = new Button("Calculate!");
         bt1.setTextAlignment(TextAlignment.CENTER);
-        bt1.setPrefSize(150,20);
+        bt1.setPrefSize(167,20);
         fp.add(bt1,0,2,1,1);
 
-        tx2 = new TextField("Result here");
-        tx2.setPrefSize(150,20);
-        tx2.setFont(new Font("Tahoma Italic", 10));
+        tx2 = new Label("Result here");
+        tx2.setPrefSize(167,25);
+        tx2.setFont(new Font("Tahoma Italic", 11));
         tx2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), null)));
         tx2.setAlignment(Pos.CENTER);
         fp.add(tx2,1,2,1,1);
 
         bt1.setOnAction(this::calc);
 
-        primaryStage.setScene(new Scene(fp, 320, 125));
+        primaryStage.setScene(new Scene(fp, 368, 125));
         primaryStage.setTitle("Regex Calculator");
         primaryStage.show();
     }
@@ -67,11 +66,36 @@ public class Main extends Application {
     private void calc(ActionEvent e) {
         String str = tx1.getText();
         System.out.println("get text = :: " + str);
-        tx2.clear();
-        tx2.setText(ext_cr(str));
+        tx2.setText("");
+        try {
+            tx2.setText(ext_cr(str));
+        } catch (NumberFormatException num) {
+            tx2.setText("Illegal Number Format");
+        } catch (StackOverflowError stl) {
+            tx2.setText("OVER-FUCKING-FLOWN");
+        }
     }
 
     private String ext_cr (String str) {
+        // First, lets see if there is error in putting parentheses
+        Pattern check = Pattern.compile("^[^\\(]+\\)");
+        Matcher matchercheck = check.matcher(str);
+
+        Pattern check2 = Pattern.compile("\\(");
+        Matcher matchercheck2 = check2.matcher(str);
+        int count2 = 0;
+        while (matchercheck2.find()) count2++;
+
+        Pattern check3 = Pattern.compile("\\)");
+        Matcher matchercheck3 = check3.matcher(str);
+        int count3 = 0;
+        while (matchercheck3.find()) count3++;
+
+        if (matchercheck.find() | count2 != count3) {
+            System.out.println("DM NGU");
+            return "PARENTHESES STUPIDITY";
+        }
+
         // Remove most inner parentheses before attempting further calculation
         Pattern p = Pattern.compile("[x:]\\(([^()]+)\\)");
         Matcher m = p.matcher(str);
