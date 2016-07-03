@@ -112,7 +112,7 @@ public class Main extends Application {
 
         if (f) {
             m.appendTail(sb);
-            return recursive_cal(sb.toString());
+            return ext_cr(sb.toString());
         } else {
             return recursive_cal(str);
         }
