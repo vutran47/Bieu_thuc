@@ -59,6 +59,7 @@ public class Main extends Application {
 
         primaryStage.setScene(new Scene(fp, 368, 125));
         primaryStage.setTitle("Regex Calculator");
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
