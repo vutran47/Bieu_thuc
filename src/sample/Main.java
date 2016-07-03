@@ -2,26 +2,27 @@ package sample;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main extends Application {
-    TextField tx1;
-    TextField tx2;
-    static int count = 0;
+    private TextField tx1;
+    private TextField tx2;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -63,16 +64,39 @@ public class Main extends Application {
     }
 
 
-    void calc(ActionEvent e) {
+    private void calc(ActionEvent e) {
         String str = tx1.getText();
         System.out.println("get text = :: " + str);
         tx2.clear();
-        tx2.setText(recursive_cal(str));
+        tx2.setText(ext_cr(str));
     }
 
-    String recursive_cal (String str) {
+    private String ext_cr (String str) {
+        // Remove most inner parentheses before attempting further calculation
+        Pattern p = Pattern.compile("[x:]\\(([^()]+)\\)");
+        Matcher m = p.matcher(str);
+        StringBuffer sb = new StringBuffer();
 
-        Pattern p = Pattern.compile("(sin|cos|tan)\\(([\\w+\\-\\+\\.x:]+)\\)");
+        boolean f = false;
+
+        while (m.find()) {
+            f = true;
+            String t = (m.group().contains(":")? ":" : "x") + calculate_simple(m.group(1));
+            m.appendReplacement(sb, t);
+        }
+
+        if (f) {
+            m.appendTail(sb);
+            return recursive_cal(sb.toString());
+        } else {
+            return recursive_cal(str);
+        }
+    }
+
+    private String recursive_cal (String str) {
+        // Solve all geometrical functions before the simpler expressions
+        // No logarithm yet
+        Pattern p = Pattern.compile("(sin|cos|tan)\\(([\\w\\-\\+\\.x:]+)\\)"); // removed a dup "+" after w
         Matcher m = p.matcher(str);
         StringBuffer sb = new StringBuffer();
         boolean found = false;
@@ -100,14 +124,13 @@ public class Main extends Application {
 
         if (found) {
             m.appendTail(sb);
-            System.out.println(sb.toString());
             return recursive_cal(sb.toString());
         } else {
             return calculate_simple(str);
         }
     }
 
-    String calculate_simple (String str) {
+    private String calculate_simple (String str) {
         Pattern p = Pattern.compile("(-?\\d+(?:\\.\\d+)?)[x:](-?\\d+(?:\\.\\d+)?)");
         Matcher m = p.matcher(str);
         boolean found = false;
