@@ -14,12 +14,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main extends Application {
     TextField tx1;
     TextField tx2;
+    static int count = 0;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -63,52 +65,78 @@ public class Main extends Application {
 
     void calc(ActionEvent e) {
         String str = tx1.getText();
-        recursive_cal(str);
+        System.out.println("get text = :: " + str);
+        tx2.clear();
+        tx2.setText(recursive_cal(str));
     }
 
-    double recursive_cal (String str) {
-        double result = 0;
-        Pattern p = Pattern.compile("(sin|cos|tan)\\([\\w+-]+?\\)");
+    String recursive_cal (String str) {
+
+        Pattern p = Pattern.compile("(sin|cos|tan)\\(([\\w+\\-\\+\\.x:]+)\\)");
         Matcher m = p.matcher(str);
+        StringBuffer sb = new StringBuffer();
         boolean found = false;
 
         while (m.find()) {
-            StringBuffer sb = new StringBuffer();
-            System.out.println("> "+m.group());
             found = true;
-
-            Pattern p2 = Pattern.compile("\\d+(.+)?(?=\\)+$)");
-            Matcher m2 = p2.matcher(m.group());
-            boolean found2 = false;
-            while (m2.find()) {
-                System.out.println(">> " + m2.group());
-                switch (m.group().substring(4,m.group().length()-1)) {
-                    case "sin":
-                        m2.appendReplacement(sb, String.valueOf(recursive_cal(m2.group())));
-                        m2.appendTail(sb);
-                        System.out.println(">>> "+ sb.toString());
-                        break;
-
-                    case "cos":
-
-                        break;
-
-                    case "tan":
-
-                        break;
-                }
+            System.out.println("Found: " + m.group(2));
+            String t = calculate_simple(m.group(2));
+            System.out.println("t = " + t);
+            double y = 0;
+            switch (m.group(1)) {
+                case "sin":
+                    y = Math.sin(Double.valueOf(t));
+                    break;
+                case "cos":
+                    y = Math.cos(Double.valueOf(t));
+                    break;
+                case "tan":
+                    y = Math.tan(Double.valueOf(t));
+                    break;
             }
 
+            m.appendReplacement(sb, String.format("%.2f",y));
         }
 
-        if (!found) {
-            System.out.println(str);
+        if (found) {
+            m.appendTail(sb);
+            System.out.println(sb.toString());
+            return recursive_cal(sb.toString());
+        } else {
+            return calculate_simple(str);
         }
-
-        return 0;
     }
 
+    String calculate_simple (String str) {
+        Pattern p = Pattern.compile("(-?\\d+(?:\\.\\d+)?)[x:](-?\\d+(?:\\.\\d+)?)");
+        Matcher m = p.matcher(str);
+        boolean found = false;
+        StringBuffer sb = new StringBuffer();
 
+        double t = 0;
+        while (m.find()) {
+            found = true;
+            if (m.group().contains(":")) {
+                t = Double.valueOf(m.group(1))/Double.valueOf(m.group(2));
+            } else {
+                t = Double.valueOf(m.group(1))*Double.valueOf(m.group(2));
+            }
+            m.appendReplacement(sb, String.format("%.2f", t));
+        }
+
+        if (found) {
+            m.appendTail(sb);
+            return calculate_simple(sb.toString());
+        } else {
+            p = Pattern.compile("(-?\\d+(?:\\.\\d+)?)");
+            m = p.matcher(str);
+
+            while (m.find()) {
+                t = t + Double.valueOf(m.group());
+            }
+            return String.valueOf(t);
+        }
+    }
 
 
     public static void main(String[] args) {
