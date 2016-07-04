@@ -24,36 +24,40 @@ public class Main extends Application {
     private TextField tx1;
     private Label tx2;
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        GridPane fp = new GridPane( );
+    public void start(Stage primaryStage) throws Exception {
+        GridPane fp = new GridPane();
         fp.setHgap(10);
         fp.setVgap(10);
         fp.setAlignment(Pos.CENTER);
-        fp.setPadding(new Insets(10,10,10,10));
+        fp.setPadding(new Insets(10, 10, 10, 10));
 
         Label lb1 = new Label("Type your mathematical expression in the text field below...");
-        lb1.setPrefSize(355,20);
+        lb1.setPrefSize(355, 20);
         lb1.setAlignment(Pos.CENTER);
         lb1.setTextAlignment(TextAlignment.CENTER);
-        fp.add(lb1,0,0,2,1);
+        fp.add(lb1, 0, 0, 2, 1);
 
         tx1 = new TextField();
-        tx1.setPrefSize(355,20);
+        tx1.setPrefSize(355, 20);
         tx1.setAlignment(Pos.CENTER);
-        fp.add(tx1,0,1,2,1);
+        fp.add(tx1, 0, 1, 2, 1);
 
         Button bt1 = new Button("Calculate!");
         bt1.setTextAlignment(TextAlignment.CENTER);
-        bt1.setPrefSize(167,20);
-        fp.add(bt1,0,2,1,1);
+        bt1.setPrefSize(167, 20);
+        fp.add(bt1, 0, 2, 1, 1);
 
         tx2 = new Label("Result here");
-        tx2.setPrefSize(167,25);
+        tx2.setPrefSize(167, 25);
         tx2.setFont(new Font("Tahoma Italic", 11));
         tx2.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(4), null)));
         tx2.setAlignment(Pos.CENTER);
-        fp.add(tx2,1,2,1,1);
+        fp.add(tx2, 1, 2, 1, 1);
 
         bt1.setOnAction(this::calc);
 
@@ -63,9 +67,8 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-
     private void calc(ActionEvent e) {
-        String str = tx1.getText().replaceAll(" ","");
+        String str = tx1.getText().replaceAll(" ", "");
         tx1.setText(str);
         tx2.setText("");
         String t;
@@ -79,7 +82,7 @@ public class Main extends Application {
         }
     }
 
-    private String ext_cr (String str) {
+    private String ext_cr(String str) {
         // First, lets see if there is error in putting parentheses
         Pattern check = Pattern.compile("^[^\\(]+\\)");
         Matcher matchercheck = check.matcher(str);
@@ -95,7 +98,6 @@ public class Main extends Application {
         while (matchercheck3.find()) count3++;
 
         if (matchercheck.find() | count2 != count3) {
-            System.out.println("DM NGU");
             return "PARENTHESES STUPIDITY";
         }
 
@@ -109,8 +111,8 @@ public class Main extends Application {
         while (m.find()) {
             f = true;
             String t;
-            if (m.group().contains(":")|m.group().contains("x")) {
-                t = (m.group().contains(":")? ":" : "x") + calculate_simple(m.group(1));
+            if (m.group().contains(":") | m.group().contains("x")) {
+                t = (m.group().contains(":") ? ":" : "x") + calculate_simple(m.group(1));
             } else {
                 t = "-" + calculate_simple(m.group(1));
             }
@@ -126,7 +128,7 @@ public class Main extends Application {
         }
     }
 
-    private String recursive_cal (String str) {
+    private String recursive_cal(String str) {
         // Solve all geometrical functions before the simpler expressions
         // No logarithm yet
         Pattern p = Pattern.compile("(sin|cos|tan)\\(([\\w\\-\\+\\.x:]+)\\)"); // removed a dup "+" after w
@@ -163,7 +165,7 @@ public class Main extends Application {
         }
     }
 
-    private String calculate_simple (String str) {
+    private String calculate_simple(String str) {
         // Multipliers first
         Pattern p = Pattern.compile("(-?\\d+(?:\\.\\d+)?)[x:](-?\\d+(?:\\.\\d+)?)");
         Matcher m = p.matcher(str);
@@ -174,9 +176,9 @@ public class Main extends Application {
         while (m.find()) {
             found = true;
             if (m.group().contains(":")) {
-                t = Double.valueOf(m.group(1))/Double.valueOf(m.group(2));
+                t = Double.valueOf(m.group(1)) / Double.valueOf(m.group(2));
             } else {
-                t = Double.valueOf(m.group(1))*Double.valueOf(m.group(2));
+                t = Double.valueOf(m.group(1)) * Double.valueOf(m.group(2));
             }
             m.appendReplacement(sb, String.valueOf(t));
         }
@@ -185,19 +187,13 @@ public class Main extends Application {
             m.appendTail(sb);
             return calculate_simple(sb.toString());
         } else {
-            str = str.replaceAll("--","+");
+            str = str.replaceAll("--", "+");
             p = Pattern.compile("(-?\\d+(?:\\.\\d+)?)");
             m = p.matcher(str);
-
             while (m.find()) {
                 t = t + Double.valueOf(m.group());
             }
             return String.valueOf(t);
         }
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
