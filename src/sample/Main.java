@@ -65,11 +65,13 @@ public class Main extends Application {
 
 
     private void calc(ActionEvent e) {
-        String str = tx1.getText();
-        System.out.println("get text = :: " + str);
+        String str = tx1.getText().replaceAll(" ","");
+        tx1.setText(str);
         tx2.setText("");
+        String t;
         try {
-            tx2.setText(ext_cr(str));
+            t = ext_cr(str);
+            tx2.setText(t);
         } catch (NumberFormatException num) {
             tx2.setText("Illegal Number Format");
         } catch (StackOverflowError stl) {
@@ -98,7 +100,7 @@ public class Main extends Application {
         }
 
         // Remove most inner parentheses before attempting further calculation
-        Pattern p = Pattern.compile("[x:]\\(([^()]+)\\)");
+        Pattern p = Pattern.compile("[x:\\-]\\(([^()]+)\\)");
         Matcher m = p.matcher(str);
         StringBuffer sb = new StringBuffer();
 
@@ -106,7 +108,12 @@ public class Main extends Application {
 
         while (m.find()) {
             f = true;
-            String t = (m.group().contains(":")? ":" : "x") + calculate_simple(m.group(1));
+            String t;
+            if (m.group().contains(":")|m.group().contains("x")) {
+                t = (m.group().contains(":")? ":" : "x") + calculate_simple(m.group(1));
+            } else {
+                t = "-" + calculate_simple(m.group(1));
+            }
             m.appendReplacement(sb, t);
         }
 
@@ -114,6 +121,7 @@ public class Main extends Application {
             m.appendTail(sb);
             return ext_cr(sb.toString());
         } else {
+            System.out.println(str);
             return recursive_cal(str);
         }
     }
@@ -144,7 +152,7 @@ public class Main extends Application {
                     break;
             }
 
-            m.appendReplacement(sb, String.format("%.2f",y));
+            m.appendReplacement(sb, String.valueOf(y));
         }
 
         if (found) {
@@ -156,6 +164,7 @@ public class Main extends Application {
     }
 
     private String calculate_simple (String str) {
+        // Multipliers first
         Pattern p = Pattern.compile("(-?\\d+(?:\\.\\d+)?)[x:](-?\\d+(?:\\.\\d+)?)");
         Matcher m = p.matcher(str);
         boolean found = false;
@@ -169,13 +178,14 @@ public class Main extends Application {
             } else {
                 t = Double.valueOf(m.group(1))*Double.valueOf(m.group(2));
             }
-            m.appendReplacement(sb, String.format("%.2f", t));
+            m.appendReplacement(sb, String.valueOf(t));
         }
 
         if (found) {
             m.appendTail(sb);
             return calculate_simple(sb.toString());
         } else {
+            str = str.replaceAll("--","+");
             p = Pattern.compile("(-?\\d+(?:\\.\\d+)?)");
             m = p.matcher(str);
 
