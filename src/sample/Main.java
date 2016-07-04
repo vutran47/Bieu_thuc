@@ -17,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.util.IllegalFormatConversionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,9 +74,9 @@ public class Main extends Application {
         tx2.setText("");
         String t;
         try {
-            t = ext_cr(str);
+            t = String.format("%.3f", Double.valueOf(ext_cr(str)));
             tx2.setText(t);
-        } catch (NumberFormatException num) {
+        } catch (IllegalFormatConversionException num) {
             tx2.setText("Illegal Number Format");
         } catch (StackOverflowError stl) {
             tx2.setText("OVER-FUCKING-FLOWN");
@@ -153,7 +154,6 @@ public class Main extends Application {
                     y = Math.tan(Double.valueOf(t));
                     break;
             }
-
             m.appendReplacement(sb, String.valueOf(y));
         }
 
